@@ -1,10 +1,10 @@
 package br.com.fiap.money_control_api.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,24 +19,27 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.com.fiap.money_control_api.model.Category;
+import br.com.fiap.money_control_api.repository.CategoryRepository;
 
 @RestController
 @RequestMapping("/categories")
 public class CategoryController {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
-	private List<Category> repository = new ArrayList<>();
+	// Injeção de Dependência
+	@Autowired
+	private CategoryRepository repository;
 
 	@GetMapping
 	public List<Category> index() {
-		return repository;
+		return repository.findAll();
 	}
 
 	@PostMapping
 	// @ResponseStatus(code = HttpStatus.CREATED)
 	public ResponseEntity<Category> create(@RequestBody Category category) {
 		log.info("Cadastrando categoria " + category.getName());
-		repository.add(category);
+		repository.save(category);
 		return ResponseEntity.status(201).body(category);
 	}
 
@@ -50,24 +53,20 @@ public class CategoryController {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void destroy(@PathVariable Long id) {
 		log.info("Apagando categoria " + id);
-		repository.remove(getCategory(id));
+		repository.delete(getCategory(id));
 	}
 
 	@PutMapping("{id}")
 	public Category update(@PathVariable Long id, @RequestBody Category category) {
 		log.info("Atualizando categoria " + id + " para " + category);
 
-		repository.remove(getCategory(id));
 		category.setId(id);
-		repository.add(category);
-
-		return category;
+		return repository.save(category);
 	}
 
 	private Category getCategory(Long id) {
-		return repository.stream()
-				.filter(c -> c.getId().equals(id))
-				.findFirst()
+		return repository
+				.findById(id)
 				.orElseThrow(
 						() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
