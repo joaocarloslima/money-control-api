@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import br.com.fiap.money_control_api.model.Category;
 import br.com.fiap.money_control_api.repository.CategoryRepository;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/categories")
@@ -37,7 +38,7 @@ public class CategoryController {
 
 	@PostMapping
 	// @ResponseStatus(code = HttpStatus.CREATED)
-	public ResponseEntity<Category> create(@RequestBody Category category) {
+	public ResponseEntity<Category> create(@RequestBody @Valid Category category) {
 		log.info("Cadastrando categoria " + category.getName());
 		repository.save(category);
 		return ResponseEntity.status(201).body(category);
