@@ -5,6 +5,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,6 +22,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import br.com.fiap.money_control_api.model.Category;
 import br.com.fiap.money_control_api.repository.CategoryRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 
 @RestController
@@ -32,12 +36,16 @@ public class CategoryController {
 	private CategoryRepository repository;
 
 	@GetMapping
+	@Cacheable("categories")
+	@Operation(tags = "Category", summary = "Listar categorias", description = "Devolve a lista de categorias com paginação e filtro...")
 	public List<Category> index() {
 		return repository.findAll();
 	}
 
 	@PostMapping
-	// @ResponseStatus(code = HttpStatus.CREATED)
+	@ResponseStatus(code = HttpStatus.CREATED)
+	@Operation(responses = @ApiResponse(responseCode = "400", description = "Validação falhou"))
+	@CacheEvict(value = "categories", allEntries = true)
 	public ResponseEntity<Category> create(@RequestBody @Valid Category category) {
 		log.info("Cadastrando categoria " + category.getName());
 		repository.save(category);
@@ -51,6 +59,7 @@ public class CategoryController {
 	}
 
 	@DeleteMapping("{id}")
+	@CacheEvict(value = "categories", allEntries = true)
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void destroy(@PathVariable Long id) {
 		log.info("Apagando categoria " + id);
@@ -58,6 +67,7 @@ public class CategoryController {
 	}
 
 	@PutMapping("{id}")
+	@CacheEvict(value = "categories", allEntries = true)
 	public Category update(@PathVariable Long id, @RequestBody Category category) {
 		log.info("Atualizando categoria " + id + " para " + category);
 
