@@ -23,30 +23,32 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
                     .requestMatchers("/transactions/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.POST, "/users/**").permitAll()
                     .anyRequest().authenticated()
                 )
+                .csrf(csrf -> csrf.disable())
                 .httpBasic(Customizer.withDefaults())
                 .build();
     }
 
-    @Bean
-    UserDetailsService userDetailsService(){
-        var user1 = User
-                        .withUsername("joao")
-                        .password("$2a$12$GH.8Gz4DeUylAeYFQ3.bFODUSFuu/zQSDGmIqYPLm.VzYn6MHYLKC")
-                        .roles("ADMIN")
-                        .build();
+    // @Bean
+    // UserDetailsService userDetailsService(){
+    //     var user1 = User
+    //                     .withUsername("joao")
+    //                     .password("$2a$12$GH.8Gz4DeUylAeYFQ3.bFODUSFuu/zQSDGmIqYPLm.VzYn6MHYLKC")
+    //                     .roles("ADMIN")
+    //                     .build();
 
-        var user2 = User
-                        .withUsername("maria")
-                        .password("$2a$12$L.XqfJcp/r4W5.pzAoIipu6q/hx.eo59/i2qLSDqg6OwCVg6biq.O")
-                        .roles("USER")
-                        .build();
+    //     var user2 = User
+    //                     .withUsername("maria")
+    //                     .password("$2a$12$L.XqfJcp/r4W5.pzAoIipu6q/hx.eo59/i2qLSDqg6OwCVg6biq.O")
+    //                     .roles("USER")
+    //                     .build();
 
-        var users = List.of(user1, user2);
+    //     var users = List.of(user1, user2);
 
-        return new InMemoryUserDetailsManager(users);
-    }
+    //     return new InMemoryUserDetailsManager(users);
+    // }
 
     @Bean
     PasswordEncoder passwordEncoder(){
