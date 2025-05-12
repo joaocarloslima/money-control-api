@@ -17,7 +17,7 @@ import br.com.fiap.money_control_api.model.UserRole;
 @Service
 public class TokenService {
 
-    Instant expiresAt = LocalDateTime.now().plusMinutes(10).toInstant(ZoneOffset.ofHours(-3));
+    Instant expiresAt = LocalDateTime.now().plusMinutes(120).toInstant(ZoneOffset.ofHours(-3));
     Algorithm algorithm = Algorithm.HMAC256("secret");
 
     public Token createToken(User user){

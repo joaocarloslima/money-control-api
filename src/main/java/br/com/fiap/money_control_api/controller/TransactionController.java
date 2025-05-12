@@ -9,10 +9,12 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.fiap.money_control_api.model.Transaction;
 import br.com.fiap.money_control_api.repository.TransactionRepository;
+import br.com.fiap.money_control_api.service.AIAnalistyService;
 import br.com.fiap.money_control_api.specification.TransactionSpecification;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,11 +29,19 @@ public class TransactionController {
     @Autowired
     private TransactionRepository repository;
 
+    @Autowired
+    private AIAnalistyService aiService;
+
     @GetMapping
     public Page<Transaction> index(TransactionFilter filters,
             @PageableDefault(size = 10, sort = "date", direction = Direction.DESC) Pageable pageable) {
         var specification = TransactionSpecification.withFilters(filters);
         return repository.findAll(specification, pageable);
+    }
+
+    @GetMapping("/dashboard")
+    public String getDashboardData(){
+        return aiService.getExpenseAnalise();
     }
 
 }
